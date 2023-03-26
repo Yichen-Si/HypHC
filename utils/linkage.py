@@ -25,7 +25,7 @@ def sl_from_embeddings(xs, S):
     xs0 = xs[None, :, :]
     xs1 = xs[:, None, :]
     sim_mat = S(xs0, xs1)  # (n, n)
-    return sl_np_mst(sim_mat.numpy())
+    return sl_np_mst(sim_mat.numpy().astype(np.float64))
 
 ### Single linkage using naive union find
 

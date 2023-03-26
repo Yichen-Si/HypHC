@@ -11,7 +11,7 @@ UCI_DATASETS = [
 ]
 
 
-def load_data(dataset, normalize=True):
+def load_data(dataset, datapath, normalize=True):
     """Load dataset.
 
     @param dataset: dataset name
@@ -22,7 +22,7 @@ def load_data(dataset, normalize=True):
     @rtype: Tuple[np.array, np.array, np.array]
     """
     if dataset in UCI_DATASETS:
-        x, y = load_uci_data(dataset)
+        x, y = load_uci_data(dataset, datapath)
     else:
         raise NotImplementedError("Unknown dataset {}.".format(dataset))
     if normalize:
@@ -37,7 +37,7 @@ def load_data(dataset, normalize=True):
     return x, y, similarities
 
 
-def load_uci_data(dataset):
+def load_uci_data(dataset, datapath):
     """Loads data from UCI repository.
 
     @param dataset: UCI dataset name
@@ -51,14 +51,14 @@ def load_uci_data(dataset):
         "iris": (0, 4, -1),
         "glass": (1, 10, -1),
     }
-    data_path = os.path.join(os.environ["DATAPATH"], dataset, "{}.data".format(dataset))
+    data_path = os.path.join(datapath, dataset, "{}.data".format(dataset))
     classes = {}
     class_counter = 0
     start_idx, end_idx, label_idx = ids[dataset]
     with open(data_path, 'r') as f:
         for line in f:
             split_line = line.split(",")
-            
+
             if len(split_line) >= end_idx - start_idx + 1:
                 x.append([float(x) for x in split_line[start_idx:end_idx]])
                 label = split_line[label_idx]

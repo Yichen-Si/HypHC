@@ -29,24 +29,21 @@ class HypHC(nn.Module):
 
     def anneal_temperature(self, anneal_factor):
         """
-
         @param anneal_factor: scalar for temperature decay
         @type anneal_factor: float
         """
         self.temperature *= anneal_factor
 
     def normalize_embeddings(self, embeddings):
-        """Normalize leaves embeddings to have the lie on a diameter."""
+        """Normalize leaves embeddings to have them lie on a diameter."""
         min_scale = 1e-2 #self.init_size
         max_scale = self.max_scale
         return F.normalize(embeddings, p=2, dim=1) * self.scale.clamp_min(min_scale).clamp_max(max_scale)
 
     def loss(self, triple_ids, similarities):
         """Computes the HypHC loss.
-        Args:
-            triple_ids: B x 3 tensor with triple ids
-            similarities: B x 3 tensor with pairwise similarities for triples 
-                          [s12, s13, s23]
+        triple_ids: B x 3 tensor with triple ids
+        similarities: B x 3 tensor with pairwise similarities [s12, s13, s23]
         """
         e1 = self.embeddings(triple_ids[:, 0])
         e2 = self.embeddings(triple_ids[:, 1])

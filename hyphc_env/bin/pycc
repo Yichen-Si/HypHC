@@ -1,0 +1,3 @@
+#!/net/wonderland/home/ycsi/Software/HypHC/hyphc_env/bin/python
+from numba.pycc import main
+main()

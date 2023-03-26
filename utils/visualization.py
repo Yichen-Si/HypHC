@@ -80,14 +80,16 @@ def is_leaf(tree, node):
     return len(list(tree.neighbors(node))) == 0
 
 
-def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, color_seed=1234):
+def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, subset=None, color_seed=1234):
     """Plots a tree on leaves embeddings using the LCA construction."""
-    circle = plt.Circle((0, 0), 1.0, color='r', alpha=0.1)
+    circle = plt.Circle((0, 0), 1.0, color='white')
     ax.add_artist(circle)
     n = leaves_embeddings.shape[0]
     embeddings = complete_tree(tree, leaves_embeddings)
+    if subset is None:
+        subset = np.arange(n)
     colors = get_colors(labels, color_seed)
-    ax.scatter(embeddings[:n, 0], embeddings[:n, 1], c=colors, s=50, alpha=0.6)
+    ax.scatter(embeddings[subset, 0], embeddings[subset, 1], c=colors, s=100, alpha=0.6)
 
     for n1, n2 in tree.edges():
         x1 = embeddings[n1]
@@ -100,12 +102,19 @@ def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, color_seed=1234):
 
 
 def get_colors(y, color_seed=1234):
-    """random color assignment for label classes."""
+    # """random color assignment for label classes."""
     np.random.seed(color_seed)
-    colors = {}
-    for k in np.unique(y):
-        r = np.random.random()
-        b = np.random.random()
-        g = np.random.random()
-        colors[k] = (r, g, b)
-    return [colors[k] for k in y]
+    # colors = {}
+    # for k in np.unique(y):
+    #     r = np.random.random()
+    #     b = np.random.random()
+    #     g = np.random.random()
+    #     colors[k] = (r, g, b)
+    # return [colors[k] for k in y]
+    label = list(set(y))
+    K = len(label)
+    k_indx = np.random.choice(range(K), size=K, replace=False)
+    k_indx = {x:k_indx[i] for i,x in enumerate(label)}
+    cmap = plt.get_cmap("turbo", K)
+    cmtx = np.array([cmap(i)[:3] for i in range(K)] )
+    return [cmtx[k_indx[x], :] for x in y]
