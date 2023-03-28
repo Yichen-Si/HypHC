@@ -32,7 +32,8 @@ def sl_from_embeddings(xs, S):
 # @profile
 def nn_merge_uf_fast_np(xs, S, partition_ratio=None, verbose=False):
     """ Uses Cython union find and numpy sorting
-
+    xs: (n, d) array of embeddings
+    S: similarity function
     partition_ratio: either None, or real number > 1
     similarities will be partitioned into buckets of geometrically increasing size
     """
@@ -48,7 +49,7 @@ def nn_merge_uf_fast_np(xs, S, partition_ratio=None, verbose=False):
     ij = np.stack([i[idx], j[idx]], axis=-1)
     dist_mat = dist_mat[idx]
 
-    # Sort pairs
+    # Sort pairs - increasing distance
     if partition_ratio is None:
         idx = np.argsort(dist_mat, axis=0)
     else:
@@ -60,7 +61,7 @@ def nn_merge_uf_fast_np(xs, S, partition_ratio=None, verbose=False):
         if verbose:
             print(ks)
         idx = np.argpartition(dist_mat, ks, axis=0)
-    ij = ij[idx]
+    ij = ij[idx] # Order pairs by distance - greedy merge
 
     # Union find merging
     uf = unionfind.UnionFind(n)

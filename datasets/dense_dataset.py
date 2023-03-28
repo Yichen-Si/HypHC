@@ -32,7 +32,7 @@ class DensePairwise:
         return torch.from_numpy(tri_i), torch.from_numpy(tri_w)
 
     def sample_triplet_random(self, rng):
-        i1, i2, i3 = rng.integers(low=0, high=self.N, size=3)
+        i1, i2, i3 = rng.choice(np.arange(self.N), size=3, replace=False, shuffle=True)
         s12 = self.mtx[i1, i2]
         s13 = self.mtx[i1, i3]
         s23 = self.mtx[i2, i3]

@@ -1,4 +1,5 @@
 """Visualization utils."""
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -80,7 +81,7 @@ def is_leaf(tree, node):
     return len(list(tree.neighbors(node))) == 0
 
 
-def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, subset=None, color_seed=1234):
+def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, colors=None, subset=None, color_seed=1234, node_size=100, annotation=None, annotation_size=10, text_coords_jitter = .02, node_shape='o'):
     """Plots a tree on leaves embeddings using the LCA construction."""
     circle = plt.Circle((0, 0), 1.0, color='white')
     ax.add_artist(circle)
@@ -88,9 +89,12 @@ def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, subset=None, colo
     embeddings = complete_tree(tree, leaves_embeddings)
     if subset is None:
         subset = np.arange(n)
-    colors = get_colors(labels, color_seed)
-    ax.scatter(embeddings[subset, 0], embeddings[subset, 1], c=colors, s=100, alpha=0.6)
-
+    if colors is None:
+        colors = get_colors(labels, color_seed)
+    ax.scatter(embeddings[subset, 0], embeddings[subset, 1], c=colors, s=node_size, alpha=0.6, marker=node_shape)
+    if annotation is not None:
+        for i, v in annotation.items():
+            ax.annotate(v, embeddings[i, :] + np.random.normal(0,text_coords_jitter,size=2), fontsize=annotation_size, c=colors[i])
     for n1, n2 in tree.edges():
         x1 = embeddings[n1]
         x2 = embeddings[n2]
@@ -102,15 +106,8 @@ def plot_tree_from_leaves(ax, tree, leaves_embeddings, labels, subset=None, colo
 
 
 def get_colors(y, color_seed=1234):
-    # """random color assignment for label classes."""
+    """random color assignment for label classes."""
     np.random.seed(color_seed)
-    # colors = {}
-    # for k in np.unique(y):
-    #     r = np.random.random()
-    #     b = np.random.random()
-    #     g = np.random.random()
-    #     colors[k] = (r, g, b)
-    # return [colors[k] for k in y]
     label = list(set(y))
     K = len(label)
     k_indx = np.random.choice(range(K), size=K, replace=False)
